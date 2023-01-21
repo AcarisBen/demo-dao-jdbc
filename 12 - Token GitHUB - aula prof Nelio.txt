@@ -1,2 +1,6 @@
 Username: acaris.ben@gmail.com
+<<<<<<< HEAD
 Token: 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
+=======
+Token: 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
+>>>>>>> f16213e293f6cd8419ba3051bf94bbeb06e1f1f9
