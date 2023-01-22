@@ -39,7 +39,7 @@ public class SellerDaoJDBC implements SellerDao {
 		st.setString(1, obj.getName());
 		st.setString(2, obj.getEmail());
 		st.setDate(3, new java.sql.Date(obj.getBirthDate().getTime()));
-		st.setDouble(4, obj.getBaseSalary());
+		st.setDouble(4, obj.getBaseSalary());		
 		st.setInt(5, obj.getDepartment().getId());
 		
 		int rowsAffected = st.executeUpdate();
@@ -92,8 +92,30 @@ public class SellerDaoJDBC implements SellerDao {
 
 	@Override
 	public void deleteById(Integer id) {
-		// TODO Auto-generated method stub
+		PreparedStatement st = null;
+	
+		try { 
+			st = conn.prepareStatement(
+					"DELETE FROM seller "
+					+ "WHERE Id = ?");
 		
+			st.setInt(1, id);
+			//st.executeUpdate();
+			 
+			// Caso nao exista o id para deletar, o programa acusa que apagou mesmo sem apagar nenhum dado.
+			// Para evitar isso, deve-se fazer:
+			
+			 int rows = st.executeUpdate();
+			if(rows == 0) {
+				throw new DbException("Unknown id! No data deleted.");
+			}
+			
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+		}	
 	}
 
 	@Override
