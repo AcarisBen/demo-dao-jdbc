@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import db.DB;
 import db.DbException;
@@ -57,12 +60,6 @@ public class SellerDaoJDBC implements SellerDao {
 			
 			Seller obj = instantiateSeller(rs, dep);
 			
-					
-			/* pode se trocar todas as linhas acima por uma unica linha e um objeto: 
-		Seller obj = new Seller(rs.getInt("Id"), rs.getString("Name"),
-		rs.getString("Email"), rs.getDate("BirthDate"), rs.getDouble("BaseSalary"),
-		new Department(rs.getInt("DepartmentId"), rs.getString("DepName")));
-			*/
 			return obj;
 		}
 		return null;
@@ -84,7 +81,13 @@ public class SellerDaoJDBC implements SellerDao {
 		obj.setEmail(rs.getString("Email"));
 		obj.setBirthDate(rs.getDate("BirthDate"));
 		obj.setBaseSalary(rs.getDouble("BaseSalary"));
-		obj.setDepartment(dep);	
+		obj.setDepartment(dep);
+		
+		/* pode se trocar todas as linhas acima por uma unica linha e um objeto: 
+		Seller obj = new Seller(rs.getInt("Id"), rs.getString("Name"),
+		rs.getString("Email"), rs.getDate("BirthDate"), rs.getDouble("BaseSalary"),
+		new Department(rs.getInt("DepartmentId"), rs.getString("DepName")));
+			*/
 		
 		return obj;
 	}
@@ -102,4 +105,53 @@ public class SellerDaoJDBC implements SellerDao {
 		return null;
 	}
 
+	@Override
+	public List<Seller> findByDepartment(Department department) {
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+			st = conn.prepareStatement(		
+		 "SELECT seller.*,department.Name as DepName "
+					+ "FROM seller INNER JOIN department "
+					+ "ON seller.DepartmentId = department.Id "
+					+ "WHERE DepartmentId = ? " 
+					+ "ORDER BY Name");
+		
+		st.setInt(1, department.getId());
+		rs = st.executeQuery();
+		
+		List<Seller> list = new ArrayList<>();
+		/* 
+ ESTE COMANDO FARIA COM FOSSE ADICIONADO UM 'DEPARTMENT' PARA CADA 'SELLER'
+		 while (rs.next()) { 
+		 	Department dep = instantiateDepartment(rs);
+			Seller obj = instantiateSeller(rs, dep);
+			list.add(obj);
+		}
+INCORRETO, a melhor forma esta apresentada abaixo:	
+		 */
+		Map<Integer, Department> map = new HashMap<>();
+		while (rs.next()) { 
+		Department dep = map.get(rs.getInt("DepartmentId"));
+
+		if (dep == null) {
+			dep = instantiateDepartment(rs);
+			map.put(rs.getInt("DepartmentId"), dep);
+		}
+		
+		Seller obj = instantiateSeller(rs, dep);
+			list.add(obj);	
+		}
+		
+		return list;
+		}
+		catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+			DB.closeResultSet(rs);
+			// nao fechar a conexao
+		}
+	}
 }
