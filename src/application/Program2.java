@@ -23,12 +23,17 @@ public class Program2 {
 		
 		System.out.println("\n=== TEST 2: department findAll ===");
 		List<Department> list = depDao.findAll();
-		//list = depDao.findAll();
+
 		for (Department dep2 : list) {
 			System.out.println(dep2);
 		}
-	
 		
+		System.out.println("\n=== TEST 3: department insert ===");
+		Department dep3 = new Department(null, sc.next());
+		depDao.insert(dep3);
+		System.out.println("Inserted! New department id = " + dep3.getId());
+		
+	
 		sc.close();
 	}
 
