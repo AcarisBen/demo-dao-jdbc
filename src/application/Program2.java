@@ -28,12 +28,19 @@ public class Program2 {
 			System.out.println(dep2);
 		}
 		
-		System.out.println("\n=== TEST 3: department insert ===");
-		Department dep3 = new Department(null, sc.next());
-		depDao.insert(dep3);
-		System.out.println("Inserted! New department id = " + dep3.getId());
-		
+		//System.out.println("\n=== TEST 3: department insert ===");
+			//Department dep3 = new Department(null, sc.next());
+		//	depDao.insert(dep3);
+		//System.out.println("Inserted! New department id = " + dep3.getId());
 	
+		System.out.println("\n=== TEST 4: department update ===");
+		Department dep4 = depDao.findById(sc.nextInt());
+		dep4.setName(sc.next());
+		depDao.update(dep4);
+		System.out.println("Update completed!");
+		System.out.println(dep4);
+		
+		
 		sc.close();
 	}
 
